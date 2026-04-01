@@ -31,7 +31,7 @@
                     drop-shadow(0 0 20px rgba(200, 0, 0, 0.6));
         }
 
-        /* --- MAIN CONTAINER (Super Slow Motion Zoom Entry) --- */
+        /* --- MAIN CONTAINER --- */
         #main-container {
             text-align: center;
             display: flex;
@@ -42,28 +42,15 @@
             width: 100%;
             padding: 0 10px;
             box-sizing: border-box;
-
-            /* Start State: Very Big & Blurred */
             opacity: 0;
             transform: scale(4); 
             filter: blur(20px); 
-            
-            /* Animation: 3.5s duration for smoothness */
             animation: smoothEntry 3.5s cubic-bezier(0.19, 1, 0.22, 1) forwards;
         }
 
-        /* Zoom Animation Logic */
         @keyframes smoothEntry {
-            0% { 
-                opacity: 0; 
-                transform: scale(4); 
-                filter: blur(20px); 
-            }
-            100% { 
-                opacity: 1; 
-                transform: scale(1); 
-                filter: blur(0px); 
-            }
+            0% { opacity: 0; transform: scale(4); filter: blur(20px); }
+            100% { opacity: 1; transform: scale(1); filter: blur(0px); }
         }
 
         /* --- GREEN TICK MARK --- */
@@ -71,7 +58,6 @@
             width: 100px;
             height: 100px;
             margin: 0 auto;
-            /* Smooth Pulse Animation */
             animation: pulseIcon 2s infinite ease-in-out;
         }
 
@@ -88,7 +74,7 @@
             100% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(57, 255, 20, 0.5)); }
         }
 
-        /* --- CONGRATULATIONS TEXT --- */
+        /* --- TEXT STYLING --- */
         #congrats-text {
             font-size: 55px; 
             font-weight: 700;
@@ -99,13 +85,10 @@
             -webkit-text-fill-color: transparent;
             text-transform: uppercase;
             letter-spacing: 2px;
-            text-shadow: 
-                0 0 15px rgba(255, 215, 0, 0.8),
-                0 0 30px rgba(255, 140, 0, 0.6);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 140, 0, 0.6);
             max-width: 90%; 
         }
 
-        /* --- INFO TEXT (Unban & Email Binding) --- */
         #info-text {
             font-size: 28px;
             color: #e0e0e0;
@@ -115,61 +98,43 @@
             text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
         }
         
-        .highlight {
-            color: #ffffff;
-            font-weight: bold;
-        }
-        
-        .status {
-            color: #aaaaaa;
-            font-size: 0.8em;
-            display: block;
-            margin-top: 5px;
-        }
+        .highlight { color: #ffffff; font-weight: bold; }
+        .status { color: #aaaaaa; font-size: 0.8em; display: block; margin-top: 5px; }
 
-        /* Timer Container */
-        #timer-container {
-            margin-top: 30px;
-        }
+        #timer-container { margin-top: 30px; }
 
-        /* Glowing Green Number */
         #timer {
             font-size: 60px;
             font-weight: 700;
             color: #39FF14;
-            text-shadow: 
-                0 0 10px #39FF14,
-                0 0 20px #39FF14,
-                0 0 40px #008000;
+            text-shadow: 0 0 10px #39FF14, 0 0 20px #39FF14, 0 0 40px #008000;
             display: block;
             line-height: 1;
         }
 
-        /* Loading Overlay */
-        #loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000000;
+        /* --- LAUNCH BUTTON (Hidden initially) --- */
+        #launch-btn {
             display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 999;
+            margin-top: 30px;
+            padding: 15px 40px;
+            font-size: 30px;
+            font-family: 'Teko', sans-serif;
+            font-weight: bold;
+            color: #000;
+            background: #39FF14;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 15px #39FF14;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
         }
 
-        #loading-image {
-            width: 100px;
-            animation: rapidBlink 0.8s infinite alternate;
+        #launch-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 0 5px #39FF14;
         }
 
-        @keyframes rapidBlink {
-            0% { opacity: 0.3; transform: scale(0.95); }
-            100% { opacity: 1; transform: scale(1.05); }
-        }
-
-        /* --- MOBILE RESPONSIVE --- */
         @media (max-width: 768px) {
             #main-container { padding-top: 70px; }
             #congrats-text { font-size: 9vw; letter-spacing: 1px; }
@@ -177,6 +142,7 @@
             #timer { font-size: 50px; }
             #top-logo { width: 100px; top: 25px; }
             .success-icon { width: 80px; height: 80px; }
+            #launch-btn { font-size: 26px; padding: 12px 30px; }
         }
     </style>
 </head>
@@ -196,24 +162,23 @@
         
         <div id="info-text">
             <span class="highlight">Unban & Email Binding</span>
-            <span class="status">Proceed...</span>
+            <span class="status" id="status-text">Proceed...</span>
         </div>
 
         <div id="timer-container">
             <span id="timer">10</span>
         </div>
-    </div>
 
-    <div id="loading-overlay">
-        <img id="loading-image" src="loding.png" alt="Loading...">
+        <button id="launch-btn" onclick="openGame()">LAUNCH FREE FIRE</button>
+
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const timerSpan = document.getElementById('timer');
-            const mainContainer = document.getElementById('main-container');
-            const loadingOverlay = document.getElementById('loading-overlay');
-            const topLogo = document.getElementById('top-logo');
+            const timerContainer = document.getElementById('timer-container');
+            const launchBtn = document.getElementById('launch-btn');
+            const statusText = document.getElementById('status-text');
             
             let timeLeft = 10;
 
@@ -223,51 +188,26 @@
 
                 if (timeLeft <= 0) {
                     clearInterval(countdownInterval);
-                    startLoadingSequence();
+                    showLaunchButton();
                 }
             }, 1000);
 
-            function startLoadingSequence() {
-                mainContainer.style.display = 'none';
-                topLogo.style.display = 'none';
-                loadingOverlay.style.display = 'flex';
-
-                setTimeout(() => {
-                    launchFreeFireMax();
-                }, 3000);
-            }
-
-            function launchFreeFireMax() {
-                const packageName = "com.dts.freefiremax";
-                const fallbackUrl = "https://garena-freefire-service-portal.github.io/moderator/congratulations/email-binding-unban-pending0287410366";
-                const intentUrl = `intent://#Intent;package=${packageName};end;`;
-
-                // Method 1: Iframe Injection (Best for bypassing browser auto-launch block)
-                const iframe = document.createElement('iframe');
-                iframe.style.display = 'none';
-                iframe.src = intentUrl;
-                document.body.appendChild(iframe);
-
-                // Method 2: Fake User Click via Anchor Tag
-                setTimeout(() => {
-                    const a = document.createElement('a');
-                    a.href = intentUrl;
-                    a.style.display = 'none';
-                    document.body.appendChild(a);
-                    a.click();
-                }, 500);
-
-                // Method 3: Direct replace (Aggressive push)
-                setTimeout(() => {
-                    window.location.replace(intentUrl);
-                }, 1000);
-
-                // Fallback (Agar game phone me install hi nahi hai, to browser wale link par jayega)
-                setTimeout(() => {
-                    window.location.href = fallbackUrl;
-                }, 3500);
+            function showLaunchButton() {
+                // Hide timer and show the button
+                timerContainer.style.display = 'none';
+                statusText.textContent = "Process Complete!";
+                launchBtn.style.display = 'block';
             }
         });
+
+        // Ye function strictly game open karega jab user click karega
+        function openGame() {
+            const packageName = "com.dts.freefiremax";
+            const intentUrl = `intent://#Intent;package=${packageName};end;`;
+            
+            // Direct launch command
+            window.location.href = intentUrl;
+        }
     </script>
 
 </body>
