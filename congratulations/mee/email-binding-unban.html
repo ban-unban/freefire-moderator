@@ -112,7 +112,7 @@
             line-height: 1;
         }
 
-        /* --- LAUNCH BUTTON (Hidden initially) --- */
+        /* --- NATIVE LAUNCH LINK (Hidden initially) --- */
         #launch-btn {
             display: none;
             margin-top: 30px;
@@ -127,6 +127,7 @@
             cursor: pointer;
             box-shadow: 0 0 15px #39FF14;
             text-transform: uppercase;
+            text-decoration: none; /* Removes link underline */
             transition: all 0.3s ease;
         }
 
@@ -169,7 +170,7 @@
             <span id="timer">10</span>
         </div>
 
-        <button id="launch-btn" onclick="openGame()">LAUNCH FREE FIRE</button>
+        <a id="launch-btn" href="intent://#Intent;package=com.dts.freefiremax;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;end;">LAUNCH FREE FIRE</a>
 
     </div>
 
@@ -196,18 +197,10 @@
                 // Hide timer and show the button
                 timerContainer.style.display = 'none';
                 statusText.textContent = "Process Complete!";
-                launchBtn.style.display = 'block';
+                // Displaying the anchor tag as an inline block so it looks like a button
+                launchBtn.style.display = 'inline-block';
             }
         });
-
-        // Ye function strictly game open karega jab user click karega
-        function openGame() {
-            const packageName = "com.dts.freefiremax";
-            const intentUrl = `intent://#Intent;package=${packageName};end;`;
-            
-            // Direct launch command
-            window.location.href = intentUrl;
-        }
     </script>
 
 </body>
