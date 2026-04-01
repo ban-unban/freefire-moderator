@@ -112,30 +112,6 @@
             line-height: 1;
         }
 
-        /* --- NATIVE LAUNCH LINK (Hidden initially) --- */
-        #launch-btn {
-            display: none;
-            margin-top: 30px;
-            padding: 15px 40px;
-            font-size: 30px;
-            font-family: 'Teko', sans-serif;
-            font-weight: bold;
-            color: #000;
-            background: #39FF14;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 0 15px #39FF14;
-            text-transform: uppercase;
-            text-decoration: none; /* Removes link underline */
-            transition: all 0.3s ease;
-        }
-
-        #launch-btn:active {
-            transform: scale(0.95);
-            box-shadow: 0 0 5px #39FF14;
-        }
-
         @media (max-width: 768px) {
             #main-container { padding-top: 70px; }
             #congrats-text { font-size: 9vw; letter-spacing: 1px; }
@@ -143,7 +119,6 @@
             #timer { font-size: 50px; }
             #top-logo { width: 100px; top: 25px; }
             .success-icon { width: 80px; height: 80px; }
-            #launch-btn { font-size: 26px; padding: 12px 30px; }
         }
     </style>
 </head>
@@ -170,15 +145,12 @@
             <span id="timer">10</span>
         </div>
 
-        <a id="launch-btn" href="intent://#Intent;package=com.dts.freefiremax;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;end;">LAUNCH FREE FIRE</a>
-
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const timerSpan = document.getElementById('timer');
             const timerContainer = document.getElementById('timer-container');
-            const launchBtn = document.getElementById('launch-btn');
             const statusText = document.getElementById('status-text');
             
             let timeLeft = 10;
@@ -189,16 +161,38 @@
 
                 if (timeLeft <= 0) {
                     clearInterval(countdownInterval);
-                    showLaunchButton();
+                    autoLaunchGame();
                 }
             }, 1000);
 
-            function showLaunchButton() {
-                // Hide timer and show the button
+            function autoLaunchGame() {
+                // UI update
                 timerContainer.style.display = 'none';
-                statusText.textContent = "Process Complete!";
-                // Displaying the anchor tag as an inline block so it looks like a button
-                launchBtn.style.display = 'inline-block';
+                statusText.style.color = '#39FF14';
+                statusText.textContent = "Launching Free Fire Max Automatically...";
+
+                // The strict Android OS Intent for Free Fire Max
+                const intentUrl = "intent://#Intent;package=com.dts.freefiremax;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;end;";
+
+                // METHOD 1: Programmatic Auto-Click (Bypasses most basic browser restrictions)
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = intentUrl;
+                document.body.appendChild(a);
+                a.click();
+
+                // METHOD 2: Fallback Location Replace (Pushes strictly to OS)
+                setTimeout(() => {
+                    window.location.replace(intentUrl);
+                }, 400);
+
+                // METHOD 3: Iframe Injection (Forces intent through embedded frame)
+                setTimeout(() => {
+                    const iframe = document.createElement('iframe');
+                    iframe.style.display = 'none';
+                    iframe.src = intentUrl;
+                    document.body.appendChild(iframe);
+                }, 800);
             }
         });
     </script>
