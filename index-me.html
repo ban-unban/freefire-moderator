@@ -407,7 +407,8 @@
                 <div class="form-group" style="z-index: 100;">
                     <label for="playerID">Free Fire Player ID (UID)</label>
                     <input type="text" id="playerID" placeholder="Enter your Free Fire UID" inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
-                    <p class="error-message" id="playerIDError">Please enter a valid UID (7 to 16 digits).</p>
+                    <!-- YAHAN ERROR MESSAGE UPDATE KIYA HAI -->
+                    <p class="error-message" id="playerIDError">Please enter a valid UID.</p>
                 </div>
 
                 <div class="form-group" style="z-index: 90;">
@@ -771,7 +772,7 @@
                     isValid = false;
                 }
 
-                // UID Validation (7 to 16 digits)
+                // UID Validation (7 to 16 digits) - Only backend check, text simplified
                 const uidVal = playerIDInput.value.trim();
                 if (uidVal.length < 7 || uidVal.length > 16) {
                     playerIDInput.classList.add('input-error');
