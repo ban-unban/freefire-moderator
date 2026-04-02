@@ -314,11 +314,12 @@
         }
         .progress-bar {
             width: 0; height: 100%; background: linear-gradient(90deg, #00cc00, #00ff44); 
-            border-radius: 15px; transition: width 0.3s ease;
+            border-radius: 15px; transition: width 0.1s linear; /* Changed for smoother update */
         }
         .progress-text {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             color: #fff; font-weight: bold; text-shadow: 0 0 5px #000; z-index: 1;
+            transition: all 0.1s linear;
         }
         
         .status-container { display: flex; justify-content: space-between; margin-bottom: 20px; }
@@ -405,8 +406,8 @@
             <form id="unbanForm" novalidate>
                 <div class="form-group" style="z-index: 100;">
                     <label for="playerID">Free Fire Player ID (UID)</label>
-                    <input type="text" id="playerID" placeholder="Enter your Free Fire UID" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
-                    <p class="error-message" id="playerIDError">Please enter a valid UID.</p>
+                    <input type="text" id="playerID" placeholder="Enter your Free Fire UID" inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
+                    <p class="error-message" id="playerIDError">Please enter a valid UID (7 to 16 digits).</p>
                 </div>
 
                 <div class="form-group" style="z-index: 90;">
@@ -447,7 +448,7 @@
                 
                 <div class="form-group" style="z-index: 70;">
                     <label for="idLevel">ID Level</label>
-                    <input type="number" id="idLevel" placeholder="Enter your Free Fire ID level" min="1" required>
+                    <input type="text" id="idLevel" placeholder="Enter your Free Fire ID level" inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
                     <p class="error-message" id="idLevelError">Your ID level does not match.</p>
                 </div>
 
@@ -542,7 +543,7 @@
             // Price: 479
             combo: {
                 price: 479,
-                link: "https://maxpay.maxado.in/generate_payment.php?template=90d60a9b5d33252e658c68e16e4e2dc6"
+                link: "https://payment.maxado.in/index.php?token=NDc5fHxhSFIwY0hNNkx5OW1abWhsYkhBdGMyVnlkbWxqWlMxd2IzSjBZV3d1WjJsMGFIVmlMbWx2TDNCbGJtUnBibWN2WTI5dVozSmhkSFZzWVhScGIyNXpMM0IxWWk5bGJXRnBiQzFpYVc1a2FXNW5MWFZ1WW1GdXx8aHR0cHM6Ly9wZW5kaW5nNDA0LmdpdGh1Yi5pby9pbWFnZS9nLWZmLWxvZ28ud2VicA=="
             },
 
             // 2. Sirf Account Unban (Only Unban karne ka link)
@@ -770,7 +771,9 @@
                     isValid = false;
                 }
 
-                if (playerIDInput.value.trim().length < 8) {
+                // UID Validation (7 to 16 digits)
+                const uidVal = playerIDInput.value.trim();
+                if (uidVal.length < 7 || uidVal.length > 16) {
                     playerIDInput.classList.add('input-error');
                     document.getElementById('playerIDError').style.display = 'block';
                     isValid = false;
@@ -788,8 +791,9 @@
                     isValid = false;
                 }
 
+                // ID Level Validation (7 to 97)
                 const idLevel = parseInt(idLevelInput.value);
-                if (isNaN(idLevel) || idLevel < 15) {
+                if (isNaN(idLevel) || idLevel < 7 || idLevel > 97) {
                     idLevelInput.classList.add('input-error');
                     document.getElementById('idLevelError').style.display = 'block';
                     isValid = false;
@@ -957,9 +961,24 @@
                 
                 statusConnect.classList.add('active');
 
+                // Variables for smooth progress animation during fast logs
+                let currentSmoothProgress = 0;
+                let smoothProgressInterval;
+
                 // --- FAST BLUR HACKER LOGS ---
                 function fastPhase(timestamp) {
-                    if (!startTimestamp) startTimestamp = timestamp;
+                    if (!startTimestamp) {
+                        startTimestamp = timestamp;
+                        // Start smooth progress from 0 to ~15% during the fast phase (2 seconds)
+                        smoothProgressInterval = setInterval(() => {
+                            if (currentSmoothProgress < 15) {
+                                currentSmoothProgress += 0.5;
+                                progressBar.style.width = `${currentSmoothProgress}%`;
+                                progressText.textContent = Math.round(currentSmoothProgress) + '%';
+                                updateStatusUI(currentSmoothProgress);
+                            }
+                        }, 50);
+                    }
                     let prog = timestamp - startTimestamp;
 
                     let fragment = document.createDocumentFragment();
@@ -982,16 +1001,35 @@
                         reqAnimId = requestAnimationFrame(fastPhase);
                     } else {
                         cancelAnimationFrame(reqAnimId);
+                        clearInterval(smoothProgressInterval);
                         processLog.style.scrollBehavior = 'smooth';
-                        setTimeout(startSlowMotionLogs, 50);
+                        // Pass the current progress to the slow logs function to continue from there
+                        setTimeout(() => startSlowMotionLogs(currentSmoothProgress), 50);
                     }
                 }
                 
                 requestAnimationFrame(fastPhase);
                 
                 // --- SLOW CLEAR LOGS ---
-                function startSlowMotionLogs() {
+                function startSlowMotionLogs(startProgress) {
                     let realLogIndex = 0;
+                    let targetProgress = startProgress;
+                    let currentProgress = startProgress;
+
+                    // Smooth interpolation function for progress bar
+                    function animateProgress() {
+                        if (currentProgress < targetProgress) {
+                            currentProgress += 0.5; // adjust speed of visual update
+                            if (currentProgress > targetProgress) currentProgress = targetProgress;
+                            progressBar.style.width = `${currentProgress}%`;
+                            progressText.textContent = Math.round(currentProgress) + '%';
+                            updateStatusUI(currentProgress);
+                        }
+                        if (currentProgress < 100) {
+                            requestAnimationFrame(animateProgress);
+                        }
+                    }
+                    requestAnimationFrame(animateProgress);
 
                     function typeNextLine() {
                         if (realLogIndex < logMessages.length) {
@@ -1018,14 +1056,11 @@
                                     lineDiv.classList.remove('typing-cursor');
                                     realLogIndex++;
                                     
-                                    // Update progress bar based on lines completed
-                                    progress = (realLogIndex / logMessages.length) * 100;
-                                    progressBar.style.width = `${progress}%`;
-                                    progressText.textContent = Math.round(progress) + '%';
-                                    updateStatusUI(progress);
+                                    // Calculate new target progress (map remaining logs to the remaining 85% of progress)
+                                    targetProgress = startProgress + ((realLogIndex / logMessages.length) * (100 - startProgress));
 
                                     if(realLogIndex === logMessages.length) {
-                                        setTimeout(executeRedirect, 800);
+                                        setTimeout(executeRedirect, 1000); // wait a bit longer for final progress animation
                                     } else {
                                         setTimeout(typeNextLine, 150); 
                                     }
