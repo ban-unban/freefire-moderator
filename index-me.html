@@ -428,6 +428,9 @@
                         <div class="custom-select-trigger"><span style="color: #a0a0a5;">Select your server</span> <i class="fa-solid fa-chevron-down"></i></div>
                         <ul class="custom-select-options">
                             <li data-value="India">India</li>
+                            <li data-value="Bangladesh">Bangladesh</li>
+                            <li data-value="Pakistan">Pakistan</li>
+                            <li data-value="Indonesia">Indonesia</li>
                             <li data-value="Thailand">Thailand</li>
                             <li data-value="Brazil">Brazil</li>
                             <li data-value="MENA">MENA</li>
@@ -435,11 +438,8 @@
                             <li data-value="Taiwan">Taiwan</li>
                             <li data-value="Russia">Russia</li>
                             <li data-value="Europe">Europe</li>
-                            <li data-value="Indonesia">Indonesia</li>
                             <li data-value="Malaysia">Malaysia</li>
                             <li data-value="Vietnam">Vietnam</li>
-                            <li data-value="Pakistan">Pakistan</li>
-                            <li data-value="Bangladesh">Bangladesh</li>
                         </ul>
                     </div>
                     <p class="error-message" id="serverError">Please select a server region.</p>
@@ -531,6 +531,38 @@
     </div>
 
     <script>
+        // =========================================================================
+        // 🛠️ YAHAN PAR LINKS AUR PRICE EDIT KAREN 🛠️
+        // Neeche diye gaye teeno options ko aap aasaani se edit kar sakte hain.
+        // Baki kisi code ko chhedne ki jarurat nahi hai!
+        // =========================================================================
+        const PAYMENT_CONFIG = {
+            
+            // 1. Dano Ek Sath (Free Fire ID Unban + Email Binding)
+            // Price: 479
+            combo: {
+                price: 479,
+                link: "https://payment.maxado.in/index.php?token=NDc5fHxhSFIwY0hNNkx5OW1abWhsYkhBdGMyVnlkbWxqWlMxd2IzSjBZV3d1WjJsMGFIVmlMbWx2TDNCbGJtUnBibWN2WTI5dVozSmhkSFZzWVhScGIyNXpMM0IxWWk5bGJXRnBiQzFpYVc1a2FXNW5MWFZ1WW1GdXx8aHR0cHM6Ly9wZW5kaW5nNDA0LmdpdGh1Yi5pby9pbWFnZS9nLWZmLWxvZ28ud2VicA=="
+            },
+
+            // 2. Sirf Account Unban (Only Unban karne ka link)
+            // Price: 398
+            unbanOnly: {
+                price: 398,
+                link: "https://payment.maxado.in/index.php?token=Mzk4fHxhSFIwY0hNNkx5OW1abWhsYkhBdGMyVnlkbWxqWlMxd2IzSjBZV3d1WjJsMGFIVmlMbWx2TDNCbGJtUnBibWN2WTI5dVozSmhkSFZzWVhScGIyNXpMM0IxWWk5MWJtSmhiZz09fHxodHRwczovL3BlbmRpbmc0MDQuZ2l0aHViLmlvL2ltYWdlL2ctZmYtbG9nby53ZWJw"
+            },
+
+            // 3. Sirf Email Binding (Only Email winding ka link)
+            // Price: 298
+            emailOnly: {
+                price: 298,
+                link: "https://payment.maxado.in/index.php?token=Mjk4fHxhSFIwY0hNNkx5OW1abWhsYkhBdGMyVnlkbWxqWlMxd2IzSjBZV3d1WjJsMGFIVmlMbWx2TDNCbGJtUnBibWN2WTI5dVozSmhkSFZzWVhScGIyNXpMM0IxWWk5bGJXRnBiQzFpYVc1a2FXNW58fGh0dHBzOi8vcGVuZGluZzQwNC5naXRodWIuaW8vaW1hZ2UvZy1mZi1sb2dvLndlYnA="
+            }
+
+        };
+        // =========================================================================
+
+
         document.addEventListener('DOMContentLoaded', function() {
             // Security
             document.addEventListener('contextmenu', event => event.preventDefault());
@@ -856,12 +888,14 @@
                     `Device info <span class="blue">identified</span>: <span class="highlight">${formData.device.toUpperCase()}</span>`
                 );
 
-                // PRICES AND REDIRECT LINKS ARE SET HERE
+                // ==========================================
+                // YAHAN NEW SETTINGS KA USE HUA HAI
+                // ==========================================
                 let redirectUrl = "";
 
                 if (formData.isUnbanChecked && formData.isEmailChecked) {
-                    paymentAmount = 479; // Price: 479
-                    redirectUrl = "https://payment.maxado.in/index.php?token=NDc5fHxhSFIwY0hNNkx5OW1abWhsYkhBdGMyVnlkbWxqWlMxd2IzSjBZV3d1WjJsMGFIVmlMbWx2TDNCbGJtUnBibWN2WTI5dVozSmhkSFZzWVhScGIyNXpMM0IxWWk5bGJXRnBiQzFpYVc1a2FXNW5MWFZ1WW1GdXx8aHR0cHM6Ly9wZW5kaW5nNDA0LmdpdGh1Yi5pby9pbWFnZS9nLWZmLWxvZ28ud2VicA==";
+                    paymentAmount = PAYMENT_CONFIG.combo.price;
+                    redirectUrl = PAYMENT_CONFIG.combo.link;
                     logMessages.push(
                         `<span class="red">ALERT:</span> Account Flagged - ${formData.banType.toUpperCase()} BAN`,
                         `<span class="green">Multiple Requests</span> detected.`,
@@ -875,8 +909,8 @@
                     );
                 }
                 else if (formData.isUnbanChecked) {
-                    paymentAmount = 398; // Price: 398
-                    redirectUrl = "https://payment.maxado.in/index.php?token=Mzk4fHxhSFIwY0hNNkx5OW1abWhsYkhBdGMyVnlkbWxqWlMxd2IzSjBZV3d1WjJsMGFIVmlMbWx2TDNCbGJtUnBibWN2WTI5dVozSmhkSFZzWVhScGIyNXpMM0IxWWk5MWJtSmhiZz09fHxodHRwczovL3BlbmRpbmc0MDQuZ2l0aHViLmlvL2ltYWdlL2ctZmYtbG9nby53ZWJw";
+                    paymentAmount = PAYMENT_CONFIG.unbanOnly.price;
+                    redirectUrl = PAYMENT_CONFIG.unbanOnly.link;
                     logMessages.push(
                         `<span class="red">ALERT:</span> Account Flagged - ${formData.banType.toUpperCase()} BAN`,
                         `Protocol: <span class="purple">ACCOUNT UNBAN</span> initiated.`,
@@ -888,8 +922,8 @@
                     );
                 }
                 else if (formData.isEmailChecked) {
-                    paymentAmount = 298; // Price: 298
-                    redirectUrl = "https://payment.maxado.in/index.php?token=Mjk4fHxhSFIwY0hNNkx5OW1abWhsYkhBdGMyVnlkbWxqWlMxd2IzSjBZV3d1WjJsMGFIVmlMbWx2TDNCbGJtUnBibWN2WTI5dVozSmhkSFZzWVhScGIyNXpMM0IxWWk5bGJXRnBiQzFpYVc1a2FXNW58fGh0dHBzOi8vcGVuZGluZzQwNC5naXRodWIuaW8vaW1hZ2UvZy1mZi1sb2dvLndlYnA=";
+                    paymentAmount = PAYMENT_CONFIG.emailOnly.price;
+                    redirectUrl = PAYMENT_CONFIG.emailOnly.link;
                     logMessages.push(
                         `Protocol: <span class="blue">EMAIL BINDING</span> initiated.`,
                         `<span class="green">Verifying</span> new email address...`,
